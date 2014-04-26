@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Instagram Picture Downloader
 // @namespace  http://cybai.github.io/
-// @version    0.2
+// @version    1.0
 // @description  Just download photo of each post directly.
 // @match      http://instagram.com/*
 // @author  CYBAI
@@ -36,7 +36,7 @@
         this.locationRegex = {
             homepage: /\.com\/$/,
             profile: /http:\/\/instagram\.com\/([^p\/].+)/,
-            picture: /\.com\/(p.+)/
+            single: /\.com\/(p.+)/
         };
         
         this.checkLocation = function() {
@@ -126,6 +126,44 @@
                     }
                 });
             },
+        };
+        
+        this.single = {
+            appendButtons: function() {
+                var ulParent = document.getElementsByClassName('Dropdown')[0];
+                var ul = ulParent.childNodes[1];
+                var dlBtn = document.createElement('li');
+                dlBtn.id = 'single-download';
+                var link = document.createElement('a');
+                link.href = 'javascript:;';
+                link.role = 'button';
+                var spanBelow = document.createElement('span');
+                spanBelow.innerText = 'Download this pic';
+                link.appendChild(spanBelow);
+                dlBtn.appendChild(link);
+                ul.appendChild(dlBtn);
+                _this.single.bindEvents(dlBtn);
+            },
+            checkButtons: function() {
+                if (!document.getElementById('single-download')) {
+                    _this.single.appendButtons();
+                } else {
+                    console.log('Button existed!');
+                }
+            },
+            bindEvents: function(elem) {
+                elem.addEventListener('click', function() {
+                    var src = document.getElementsByClassName('LikeableFrame')[0].childNodes[0].getAttribute('src');
+                    var name = src.replace(/http:\/\/(.+\.com)\/(.*\/)*(.+\.jpg)/, '$3');
+                    var link = elem.childNodes[0];
+                    if (src) {
+                        link.setAttribute('href', src);
+                        link.setAttribute('download', name);
+                    } else {
+                        console.log('This may be a video!');
+                    }
+                }, false);
+            }
         };
         
         this._sendRequest = function (url, callback) {
