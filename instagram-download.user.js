@@ -33,7 +33,7 @@
                 profile: /http:\/\/instagram\.com\/([^p\/].+)/,
                 single: /\.com\/(p.+)/
             };
-            GM_addStyle('a.insta-download { position: relative; float: left; display: inline-block; height: 100%; width: 48px; -webkit-user-select: none; -moz-user-select: none; user-select: none; background: url(' + this.ICONS.homeDownload + ') no-repeat; border-right: 1px solid #ddd; -webkit-box-shadow: 1px 0 0 rgba(255,255,255,.9); -moz-box-shadow: 1px 0 0 rgba(255,255,255,.9); box-shadow: 1px 0 0 rgba(255,255,255,.9); background-position: center; opacity: .3; } a.insta-download:hover { opacity: .7; } ');
+            GM_addStyle('#album-download { cursor: pointer } a.insta-download { position: relative; float: left; display: inline-block; height: 100%; width: 48px; -webkit-user-select: none; -moz-user-select: none; user-select: none; background: url(' + this.ICONS.homeDownload + ') no-repeat; border-right: 1px solid #ddd; -webkit-box-shadow: 1px 0 0 rgba(255,255,255,.9); -moz-box-shadow: 1px 0 0 rgba(255,255,255,.9); box-shadow: 1px 0 0 rgba(255,255,255,.9); background-position: center; opacity: .3; } a.insta-download:hover { opacity: .7; } ');
         },
         append:  function() {},
         beAppended: function() {},
@@ -91,8 +91,9 @@
         var statusbar = document.getElementsByClassName('user-stats')[0];
         var dlBtn = document.createElement('li');
         dlBtn.id = 'album-download';
+        dlBtn.className = 'sStat';
         var spanAbove = document.createElement('span');
-        spanAbove.className = 'number-stat';
+        spanAbove.className = 'sCount';
         spanAbove.innerText = 'Album';
         var spanBelow = document.createElement('span');
         spanBelow.innerText = 'download';
@@ -208,13 +209,13 @@
     
     instaPicDownloader.init();
 
-    console.clear();
+    // console.clear();
 
     var checkLocation = function() {
-        debugger;
+        // debugger;
         for (regex in instaPicDownloader.homepageDownloadButtons.locationRegex) {
             if (location.href.match(instaPicDownloader.homepageDownloadButtons.locationRegex[regex])) {
-                console.log(instaPicDownloader);
+                // console.log(instaPicDownloader);
                 instaPicDownloader[regex]();
                 break;
             }
