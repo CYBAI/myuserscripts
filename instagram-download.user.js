@@ -33,7 +33,7 @@
                 profile: /http:\/\/instagram\.com\/([^p\/].+)/,
                 single: /\.com\/(p.+)/
             };
-            GM_addStyle('#album-download { cursor: pointer } a.insta-download { position: relative; float: left; display: inline-block; height: 100%; width: 48px; -webkit-user-select: none; -moz-user-select: none; user-select: none; background: url(' + this.ICONS.homeDownload + ') no-repeat; border-right: 1px solid #ddd; -webkit-box-shadow: 1px 0 0 rgba(255,255,255,.9); -moz-box-shadow: 1px 0 0 rgba(255,255,255,.9); box-shadow: 1px 0 0 rgba(255,255,255,.9); background-position: center; opacity: .3; } a.insta-download:hover { opacity: .7; } ');
+            GM_addStyle('#album-download { cursor: pointer } a.insta-download { position: relative; float: left; display: inline-block; height: 100%; width: 48px; -webkit-user-select: none; -moz-user-select: none; user-select: none; background: url(' + this.ICONS.homeDownload + ') no-repeat; border-right: 1px solid #ddd; -webkit-box-shadow: 1px 0 0 rgba(255,255,255,.9); -moz-box-shadow: 1px 0 0 rgba(255,255,255,.9); box-shadow: 1px 0 0 rgba(255,255,255,.9); background-position: center; opacity: .3; } a.insta-download:hover { opacity: .7; } button.user-comment-btn { color: #fff; padding: 8px 14px 10px; background-color: #bc1815; border: none; right: 30px; background-color: #bc1815; position: absolute; -webkit-box-shadow: inset 0px -3px 1px rgba(0, 0, 0, 0.45), 0px 2px 2px rgba(0, 0, 0, 0.25); -moz-box-shadow: inset 0px -3px 1px rgba(0, 0, 0, 0.45), 0px 2px 2px rgba(0, 0, 0, 0.25); box-shadow: inset 0px -3px 1px rgba(0, 0, 0, 0.45), 0px 2px 2px rgba(0, 0, 0, 0.25); -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5); } button.user-comment-btn:active { position: relative; right: 15px; top: 3px; box-shadow: inset 0px -3px 1px rgba(255, 255, 255, 1), inset 0 0px 3px rgba(0, 0, 0, 0.9); }');
         },
         append:  function() {},
         beAppended: function() {},
@@ -88,7 +88,7 @@
     var ProfileDownloadButtons = function() {};
     ProfileDownloadButtons.prototype = Object.create(ButtonInterface);
     ProfileDownloadButtons.prototype.append = function() {
-        var statusbar = document.getElementsByClassName('user-stats')[0];
+        var statusbar = document.getElementsByClassName('upuiStats')[0];
         var dlBtn = document.createElement('li');
         dlBtn.id = 'album-download';
         dlBtn.className = 'sStat';
@@ -211,23 +211,44 @@
 
     // console.clear();
 
-    var checkLocation = function() {
-        // debugger;
+    function checkLocation() {
         for (regex in instaPicDownloader.homepageDownloadButtons.locationRegex) {
             if (location.href.match(instaPicDownloader.homepageDownloadButtons.locationRegex[regex])) {
-                // console.log(instaPicDownloader);
                 instaPicDownloader[regex]();
                 break;
             }
         }
     };
     
+    function addCommentReply() {
+        Array.prototype.forEach.call(document.getElementsByClassName('timelineComment'), function(val) {
+          if (val.className.indexOf('timelineCommentMore') === -1 && val.className.indexOf('timelineCaption') === -1) {
+            if (val.lastChild.className === 'user-comment-btn') {
+              return false;
+            }
+            var btn = document.createElement('button');
+            btn.className = 'user-comment-btn';
+            btn.style.float = 'right';
+            btn.innerText = 'Reply';
+            btn.addEventListener('click', function () {
+              var replyName = val.firstChild.href.match(/http:\/\/instagram.com\/(.*)\//)[1];
+              if (val.parentNode.parentNode.nextSibling.lastChild.firstChild.firstChild.value.indexOf(replyName) !== -1) {
+                return;
+              }
+              val.parentNode.parentNode.nextSibling.lastChild.firstChild.firstChild.value += '@' + replyName + ' ';
+            });
+            val.appendChild(btn);
+          }
+        });
+    }
+    
     window.onload = checkLocation();
 
     var target = document.getElementsByTagName('body')[0];
     var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
-            checkLocation(mutation);
+            checkLocation();
+            addCommentReply();
         });
     });
     
